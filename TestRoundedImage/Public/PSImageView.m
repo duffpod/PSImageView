@@ -14,6 +14,8 @@
 @synthesize borderWidth = _borderWidth;
 @synthesize borderColor = _borderColor;
 
+@synthesize rounded = _rounded;
+
 #pragma mark --
 #pragma mark - Initializers
 
@@ -87,38 +89,46 @@
 - (void)drawRect:(CGRect)rect {
     // Drawing code
     
-    // Begin a new image that will be the new image with the rounded corners
-    UIGraphicsBeginImageContextWithOptions(_image.size, NO, _image.scale);
+    if(_rounded) {
     
-    // Add a clip before drawing anything, in the shape of an rounded rect
-    CGRect frame = CGRectMake(0, 0, _image.size.width, _image.size.height);
-    [[UIBezierPath bezierPathWithRoundedRect:frame cornerRadius:_image.size.height] addClip];
+        // Begin a new image that will be the new image with the rounded corners
+        UIGraphicsBeginImageContextWithOptions(_image.size, NO, _image.scale);
+        
+        // Add a clip before drawing anything, in the shape of an rounded rect
+        CGRect frame = CGRectMake(0, 0, _image.size.width, _image.size.height);
+        [[UIBezierPath bezierPathWithRoundedRect:frame cornerRadius:_image.size.height] addClip];
 
-    // Draw your image
-    [_image drawInRect:frame];
-    
-    // Get the image, here setting the UIImageView image
-    UIImage *roundedImage = UIGraphicsGetImageFromCurrentImageContext();
-    
-    // Lets forget about that we were drawing
-    UIGraphicsEndImageContext();
-    
-    if(_borderWidth > 0 && (_borderColor && ![_borderColor isEqual:[UIColor clearColor]])) {
+        // Draw your image
+        [_image drawInRect:frame];
         
-        rect.origin.x = rect.origin.x + _borderWidth;
-        rect.origin.y = rect.origin.y + _borderWidth;
-        rect.size.width = rect.size.width - _borderWidth * 2;
-        rect.size.height = rect.size.height - _borderWidth * 2;
+        // Get the image, here setting the UIImageView image
+        UIImage *roundedImage = UIGraphicsGetImageFromCurrentImageContext();
         
-        UIBezierPath *path = [UIBezierPath bezierPathWithRoundedRect:rect cornerRadius:_image.size.height];
+        // Lets forget about that we were drawing
+        UIGraphicsEndImageContext();
         
-        [_borderColor setStroke];
-        path.lineWidth = _borderWidth;
-        [path stroke];
+        if(_borderWidth > 0 && (_borderColor && ![_borderColor isEqual:[UIColor clearColor]])) {
+            
+            rect.origin.x = rect.origin.x + _borderWidth;
+            rect.origin.y = rect.origin.y + _borderWidth;
+            rect.size.width = rect.size.width - _borderWidth * 2;
+            rect.size.height = rect.size.height - _borderWidth * 2;
+            
+            UIBezierPath *path = [UIBezierPath bezierPathWithRoundedRect:rect cornerRadius:_image.size.height];
+            
+            [_borderColor setStroke];
+            path.lineWidth = _borderWidth;
+            [path stroke];
+            
+        }
+
+        [roundedImage drawInRect:rect];
+        
+    }else{
+        
+        [_image drawInRect:rect];
         
     }
-
-    [roundedImage drawInRect:rect];
 
 }
 
