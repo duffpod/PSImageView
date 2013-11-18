@@ -38,7 +38,7 @@
     
     if(self) {
         
-        self.backgroundColor = [UIColor blackColor];
+        self.backgroundColor = [UIColor clearColor];
         
     }
     
