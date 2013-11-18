@@ -11,7 +11,7 @@
 @interface PSImageView : UIImageView
 
 @property (nonatomic, assign) CGFloat borderWidth;
-@property (nonatomic, weak) UIColor *borderColor;
+@property (nonatomic, assign) UIColor *borderColor;
 
 @property (nonatomic, assign) BOOL rounded;
 
