@@ -24,6 +24,7 @@
     PSImageView *imageView = [[PSImageView alloc] initWithFrame:CGRectMake(0, 0, 200, 200)];
     imageView.center = self.view.center;
     imageView.rounded = YES;
+    imageView.processed = YES;
     
     imageView.borderWidth = 2.0f;
     imageView.borderColor = [UIColor colorWithRed:0.0f green:0.0f blue:1.0f alpha:0.5f];

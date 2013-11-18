@@ -14,6 +14,7 @@
 @synthesize borderColor = _borderColor;
 
 @synthesize rounded = _rounded;
+@synthesize processed = _processed;
 
 #pragma mark --
 #pragma mark - Initializers
@@ -76,13 +77,31 @@
                                                                        image.size.height,
                                                                        image.size.height)];
             
-            UIImage *image_ = [self proccess:image];
+            if(!_processed) {
             
-            [super setImage:image_];
+                UIImage *image_ = [self proccess:image];
+                
+                [super setImage:image_];
+                
+            }else{
+                
+                [super setImage:image];
+                
+            }
             
         }else{
             
-            [super setImage:image];
+            if(!_processed) {
+            
+                UIImage *image_ = [self proccess:image];
+            
+                [super setImage:image_];
+                
+            }else{
+                
+                [super setImage:image];
+                
+            }
             
         }
         

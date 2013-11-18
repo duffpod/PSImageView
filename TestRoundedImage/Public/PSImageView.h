@@ -14,5 +14,6 @@
 @property (nonatomic, assign) UIColor *borderColor;
 
 @property (nonatomic, assign) BOOL rounded;
+@property (nonatomic, assign) BOOL processed;
 
 @end
