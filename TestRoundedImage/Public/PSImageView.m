@@ -38,7 +38,7 @@
     
     if(self) {
         
-        self.backgroundColor = [UIColor clearColor];
+        self.backgroundColor = [UIColor blackColor];
         
     }
     
@@ -136,33 +136,26 @@
     }
     
     CGPathRef clipPath = CGPathCreateWithEllipseInRect(rect, NULL);
-    CGPathRef strokePathRef = CGPathCreateCopy(clipPath);
-        
-    CGContextAddPath(bitmapContext, clipPath);
-    CGContextClip(bitmapContext);
-    CGPathRelease(clipPath);
-    
-    CGContextDrawImage(bitmapContext, rect, imageRef);
-    CGImageRelease(imageRef);
+    CGPathRef strokePathRef = CGPathCreateWithEllipseInRect(frame, NULL);
     
     if(stroke) {
         
         CGContextBeginPath(bitmapContext);
         CGContextAddPath(bitmapContext, strokePathRef);
         
-        CGContextSetLineCap(bitmapContext, kCGLineCapRound);
-        CGContextSetLineJoin(bitmapContext, kCGLineJoinRound);
-        CGContextSetAllowsAntialiasing(bitmapContext, YES);
-        CGContextSetShouldAntialias(bitmapContext, YES);
-        CGContextSetMiterLimit(bitmapContext, 2.0);
-        
-        CGContextSetStrokeColorWithColor(bitmapContext, _borderColor.CGColor);
-        CGContextSetLineWidth(bitmapContext, borderWidth_);
-        CGContextStrokePath(bitmapContext);
+        CGContextSetFillColorWithColor(bitmapContext, _borderColor.CGColor);
+        CGContextFillPath(bitmapContext);
         
     }
     
     CGPathRelease(strokePathRef);
+    
+    CGContextAddPath(bitmapContext, clipPath);
+    CGContextClip(bitmapContext);
+    CGPathRelease(clipPath);
+    
+    CGContextDrawImage(bitmapContext, rect, imageRef);
+    CGImageRelease(imageRef);
     
     CGImageRef roundedImageRef = CGBitmapContextCreateImage(bitmapContext);
     UIImage *roundedImage = [UIImage imageWithCGImage:roundedImageRef scale:scale orientation:UIImageOrientationUp];
