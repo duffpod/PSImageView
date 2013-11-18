@@ -8,11 +8,10 @@
 
 #import <UIKit/UIKit.h>
 
-@interface PSImageView : UIView
+@interface PSImageView : UIImageView
 
-@property (nonatomic, retain) UIImage *image;
 @property (nonatomic, assign) CGFloat borderWidth;
-@property (nonatomic, assign) UIColor *borderColor;
+@property (nonatomic, weak) UIColor *borderColor;
 
 @property (nonatomic, assign) BOOL rounded;
 

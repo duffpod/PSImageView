@@ -10,7 +10,6 @@
 
 @implementation PSImageView
 
-@synthesize image = _image;
 @synthesize borderWidth = _borderWidth;
 @synthesize borderColor = _borderColor;
 
@@ -66,70 +65,113 @@
 
 - (void)setImage:(UIImage *)image {
     
-    if(image.size.width != image.size.height) {
+    if(_rounded) {
         
-        // Make square from center, based on image height
+        if(image.size.width != image.size.height) {
+            
+            // Make square from center, based on image height
+            
+            image = [self image:image byCroppingToRectangle:CGRectMake(image.size.width / 2 - image.size.height / 2,
+                                                                       image.size.height / 2 - image.size.height / 2,
+                                                                       image.size.height,
+                                                                       image.size.height)];
+            
+            UIImage *image_ = [self proccess:image];
+            
+            [super setImage:image_];
+            
+        }else{
+            
+            [super setImage:image];
+            
+        }
+        
+    }else{
         
         image = [self image:image byCroppingToRectangle:CGRectMake(image.size.width / 2 - image.size.height / 2,
                                                                    image.size.height / 2 - image.size.height / 2,
                                                                    image.size.height,
                                                                    image.size.height)];
         
+        [super setImage:image];
+        
     }
-    
-    _image = image;
-    
-    [self setNeedsDisplay];
     
 }
 
 #pragma mark --
-#pragma mark - Drawing
+#pragma mark - Proccessing
 
-- (void)drawRect:(CGRect)rect {
-    // Drawing code
+- (UIImage *)proccess:(UIImage *)image_ {
     
-    if(_rounded) {
+    BOOL stroke = NO;
+    CGFloat borderWidth_;
+    CGFloat scale = [UIScreen mainScreen].scale;
     
-        // Begin a new image that will be the new image with the rounded corners
-        UIGraphicsBeginImageContextWithOptions(_image.size, NO, _image.scale);
+    CGImageRef imageRef = CGImageCreateCopy([image_ CGImage]);
+    CGRect frame = CGRectMake(0.0f, 0.0f, self.bounds.size.width * scale, self.bounds.size.height * scale);
+    
+    CGRect rect = frame;
+    
+    CGContextRef bitmapContext = CGBitmapContextCreate(NULL,
+                                                       rect.size.width,
+                                                       rect.size.height,
+                                                       CGImageGetBitsPerComponent(imageRef),
+                                                       CGImageGetBytesPerRow(imageRef),
+                                                       CGImageGetColorSpace(imageRef),
+                                                       CGImageGetBitmapInfo(imageRef)
+                                                       );
+    
+    if(_borderWidth > 0 && (_borderColor && ![_borderColor isEqual:[UIColor clearColor]])) {
         
-        // Add a clip before drawing anything, in the shape of an rounded rect
-        CGRect frame = CGRectMake(0, 0, _image.size.width, _image.size.height);
-        [[UIBezierPath bezierPathWithRoundedRect:frame cornerRadius:_image.size.height] addClip];
-
-        // Draw your image
-        [_image drawInRect:frame];
+        borderWidth_ = scale * _borderWidth;
         
-        // Get the image, here setting the UIImageView image
-        UIImage *roundedImage = UIGraphicsGetImageFromCurrentImageContext();
+        stroke = YES;
         
-        // Lets forget about that we were drawing
-        UIGraphicsEndImageContext();
-        
-        if(_borderWidth > 0 && (_borderColor && ![_borderColor isEqual:[UIColor clearColor]])) {
-            
-            rect.origin.x = rect.origin.x + _borderWidth;
-            rect.origin.y = rect.origin.y + _borderWidth;
-            rect.size.width = rect.size.width - _borderWidth * 2;
-            rect.size.height = rect.size.height - _borderWidth * 2;
-            
-            UIBezierPath *path = [UIBezierPath bezierPathWithRoundedRect:rect cornerRadius:_image.size.height];
-            
-            [_borderColor setStroke];
-            path.lineWidth = _borderWidth;
-            [path stroke];
-            
-        }
-
-        [roundedImage drawInRect:rect];
-        
-    }else{
-        
-        [_image drawInRect:rect];
+        rect.origin.x = frame.origin.x + borderWidth_;
+        rect.origin.y = frame.origin.y + borderWidth_;
+        rect.size.width = frame.size.width - borderWidth_ * 2;
+        rect.size.height = frame.size.height - borderWidth_ * 2;
         
     }
+    
+    CGPathRef clipPath = CGPathCreateWithEllipseInRect(rect, NULL);
+    CGPathRef strokePathRef = CGPathCreateCopy(clipPath);
+        
+    CGContextAddPath(bitmapContext, clipPath);
+    CGContextClip(bitmapContext);
+    CGPathRelease(clipPath);
+    
+    CGContextDrawImage(bitmapContext, rect, imageRef);
+    CGImageRelease(imageRef);
+    
+    if(stroke) {
+        
+        CGContextBeginPath(bitmapContext);
+        CGContextAddPath(bitmapContext, strokePathRef);
+        
+        CGContextSetLineCap(bitmapContext, kCGLineCapRound);
+        CGContextSetLineJoin(bitmapContext, kCGLineJoinRound);
+        CGContextSetAllowsAntialiasing(bitmapContext, YES);
+        CGContextSetShouldAntialias(bitmapContext, YES);
+        CGContextSetMiterLimit(bitmapContext, 2.0);
+        
+        CGContextSetStrokeColorWithColor(bitmapContext, _borderColor.CGColor);
+        CGContextSetLineWidth(bitmapContext, borderWidth_);
+        CGContextStrokePath(bitmapContext);
+        
+    }
+    
+    CGPathRelease(strokePathRef);
+    
+    CGImageRef roundedImageRef = CGBitmapContextCreateImage(bitmapContext);
+    UIImage *roundedImage = [UIImage imageWithCGImage:roundedImageRef scale:scale orientation:UIImageOrientationUp];
 
+    CGImageRelease(roundedImageRef);
+    CGContextRelease(bitmapContext);
+    
+    return roundedImage;
+    
 }
 
 #pragma mark --
