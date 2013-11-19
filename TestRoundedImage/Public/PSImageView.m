@@ -78,7 +78,7 @@
                                                                        image.size.height)];
             
             if(!_processed) {
-            
+                
                 UIImage *image_ = [self proccess:image];
                 
                 [super setImage:image_];
@@ -92,9 +92,9 @@
         }else{
             
             if(!_processed) {
-            
+                
                 UIImage *image_ = [self proccess:image];
-            
+                
                 [super setImage:image_];
                 
             }else{
@@ -138,7 +138,7 @@
                                                        CGImageGetBitsPerComponent(imageRef),
                                                        CGImageGetBytesPerRow(imageRef),
                                                        CGImageGetColorSpace(imageRef),
-                                                       CGImageGetBitmapInfo(imageRef)
+                                                       kCGBitmapByteOrder32Little | kCGImageAlphaPremultipliedFirst
                                                        );
     
     if(_borderWidth > 0 && (_borderColor && ![_borderColor isEqual:[UIColor clearColor]])) {
@@ -155,9 +155,11 @@
     }
     
     CGPathRef clipPath = CGPathCreateWithEllipseInRect(rect, NULL);
-    CGPathRef strokePathRef = CGPathCreateWithEllipseInRect(frame, NULL);
+    CGPathRef strokePathRef = NULL;
     
     if(stroke) {
+        
+        strokePathRef = CGPathCreateWithEllipseInRect(frame, NULL);
         
         CGContextBeginPath(bitmapContext);
         CGContextAddPath(bitmapContext, strokePathRef);
@@ -178,7 +180,7 @@
     
     CGImageRef roundedImageRef = CGBitmapContextCreateImage(bitmapContext);
     UIImage *roundedImage = [UIImage imageWithCGImage:roundedImageRef scale:scale orientation:UIImageOrientationUp];
-
+    
     CGImageRelease(roundedImageRef);
     CGContextRelease(bitmapContext);
     
