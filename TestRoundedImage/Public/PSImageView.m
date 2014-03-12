@@ -128,6 +128,8 @@
     CGFloat scale = [UIScreen mainScreen].scale;
     
     CGImageRef imageRef = CGImageCreateCopy([image_ CGImage]);
+    if(imageRef == NULL) return nil;
+    
     CGRect frame = CGRectMake(0.0f, 0.0f, self.bounds.size.width * scale, self.bounds.size.height * scale);
     
     CGRect rect = frame;
