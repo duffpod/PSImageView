@@ -264,6 +264,8 @@
     // set the draw rect to pan the image to the right spot
     CGRect drawRect = CGRectMake(orgX, orgY, imageToCrop.size.width, imageToCrop.size.height);
     
+    if(CGRectIsEmpty(drawRect)) return nil;
+    
     // create a context for the new image
     UIGraphicsBeginImageContextWithOptions(size, NO, imageToCrop.scale);
     CGContextRef gc = UIGraphicsGetCurrentContext();
